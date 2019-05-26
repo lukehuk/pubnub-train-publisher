@@ -19,20 +19,20 @@ BOUNCETIME_MS = 200
 def publish_callback(result, status):
     if status.is_error():
         print("ERROR" + status.error_data.information)
-    else:
-        print("SUCCESS: " + str(result.timetoken))
 
 
 # Handles the publish of a PubNub message
-def publish_message(triggered_pin, is_rising):
-    pubnub.publish().channel(PUBNUB_CHANNEL_NAME).message([triggered_pin, is_rising]).pn_async(publish_callback)
+def publish_message(triggered_pin):
+    pubnub.publish().channel(PUBNUB_CHANNEL_NAME).message({
+        "detectorId": str(triggered_pin)
+    }).pn_async(publish_callback)
 
 
 # Called when a Raspberry Pi GPIO pin changes from a high voltage to a low voltage state. Publishes a PubNub message
 def falling_callback(triggered_pin):
-    print("Button " + str(triggered_pin) + " was released " + str(datetime.datetime.now()))
+    print("Button " + str(triggered_pin) + " was released " + str(datetime.datetime.now()) + "\n")
     sys.stdout.flush()  # This avoids messages in quick succession appearing jumbled in the log
-    publish_message(triggered_pin, False)
+    publish_message(triggered_pin)
 
 
 # Initialise PubNub
